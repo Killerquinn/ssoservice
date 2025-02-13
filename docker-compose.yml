@@ -1,0 +1,96 @@
+version: "3.9"
+
+
+services:
+  sso_microsevice:
+    container_name: sso_microsevice
+    build: ./
+    dockerfile: docker/Dockerfile.HotReload
+    ports:
+      -"5000:5000"
+      -"5555:5555"
+      -"7070:7070"
+    environment:
+      - PORT=5000
+    depends_on:
+      - postgresql
+      - redis
+      - prometheus
+      - node_exporter
+      - grafana
+    restart: always
+    volumes:
+      -./:/app
+    networks:
+      - sso_network
+
+  redis:
+    image: redis:9.7.0
+    container_name: redis_sso
+    ports: 
+    - "6379:6379"
+    restart: always
+    networks:
+    - sso_network
+  
+  postgresql:
+    image: postgresql:17.2
+    container_name: postgres_sso
+    ports:
+      -"5432:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER="${POSTGRES_USER}"
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+      - POSTGRES_DB="sso_postgres_db"
+    volumes:
+      -./pgdata:/var/lib/postgresql/data
+    networks:
+      - sso_network
+  
+  prometheus:
+    container_name: prometheus_container
+    image: prom/prometeus
+    volumes:
+      -./docker/monitoring/prometheus-local.yml:/etc/prometheus/prometheus.yml:Z
+    command: 
+      - '--config_file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.conseole.templates=/usr/share/prometheus/consoles'
+    ports:
+      - '9090:9090'
+    networks:
+      - sso_network
+    
+  node_exporter:
+    container_name: node_exporter_container
+    image: prom/node-node_exporter
+    ports:
+      - '9101:9100'
+    networks:
+      - sso_network
+  
+  grafana:
+    container_name: grafana_container
+    image: grafana/grafana
+    ports:
+      -"3000:3000"
+    networks:
+      - sso_network
+  
+  jaeger:
+    container_name: jaeger_container
+    restart: always
+    image: jaegertracing
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    ports:
+      - 14250:14250
+    networks:
+      - sso_network
+
+networks:
+  sso_network:
+    driver: bridge

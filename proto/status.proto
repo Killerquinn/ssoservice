@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package status;
+
+option go_package = "github.com/killerquinn/stagen;stagen";
+
+service Status{
+    rpc IsBanned(IsBannedRequest) returns (IsBannedResponse);
+    rpc CurrentRole(RoleRequest) returns (RoleResponse);
+    rpc LastLogin(LastLogRequest) returns (LastLogResponse);
+}
+
+message IsBannedRequest{
+    int64 user_id = 1;
+}
+
+message IsBannedResponse{
+    bool isBanned = 1;
+    string message = 2;
+}
+
+message RoleRequest{
+    int64 user_id = 1;
+}
+
+message RoleResponse{
+    string username = 1;
+    string role = 2;
+}
+
+message LastLogRequest{
+    int64 user_id = 1;
+}
+
+message LastLogResponse{
+    string lastlogin = 1;
+}

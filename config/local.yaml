@@ -1,0 +1,35 @@
+env : "local" #dev, also have a prod environment
+token_ttl: 30m
+
+grpc:
+  port: 8808
+  timeout: 10h
+
+postgres:
+  postgresql_host: "localhost"
+  postgresql_port: "5432"
+  postgresql_user: "${POSTGRES_USER}"
+  postgresql_password: "${POSTGRES_PASSWORD}"
+  postgresql_dbname: "sso_postgres_db"
+  postgresql_sslmode: "false"
+  pg_driver: "pgx"
+
+redis:
+  redis_addr: localhost:6379
+  redis_password: ""
+  redis_db: 0
+  redis_default_db: 0
+  redis_min_idle_conns: 200
+  redis_pool_size: 4000
+  redis_pool_timeout: 240
+  rd_password: ""
+  rd_db: 0
+
+metrics:
+  prom_url: localhost:9090
+  prom_service_name: sso
+
+jaeger:
+  jaeger_host: localhost:14250
+  jaeger_service_name: sso
+  jaeger_log_spans: false

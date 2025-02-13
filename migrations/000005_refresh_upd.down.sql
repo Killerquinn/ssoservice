@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS refresh_tokens;
+
+ALTER TABLE apps
+ADD app_secret TEXT NOT NULL UNIQUE;
